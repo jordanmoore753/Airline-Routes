@@ -1,3 +1,27 @@
+const helpers = {
+  getAirlineById: function(id) {
+    let selected;
+
+    airlines.forEach(function(airline) {
+      if (airline.id === id) {
+        selected = airline;
+      }
+    });
+
+    return selected;
+  },
+
+  getAirportByCode: function(code) {
+    for (let i = 0; i < airports.length; i += 1) {
+      if (airports[i].code === code) {
+        return airports[i];
+      }
+    }
+
+    return null;
+  }
+};
+
 const routes = [
     {"airline":24,"src":"DFW","dest":"XNA"}, 
     {"airline":24,"src":"DFW","dest":"FWA"}, 
@@ -1395,4 +1419,4 @@ const airports = [
 
 ];
 
-export default {routes, airlines, airports};
+export default {routes, airlines, airports, helpers};
