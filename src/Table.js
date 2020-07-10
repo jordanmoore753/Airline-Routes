@@ -32,19 +32,21 @@ class Table extends Component {
   }
 
   render() {
-    const data = this.humanizeData(this.props);
-
     return (
       <table className="routes-table">
         <thead>
           <tr>
-            <th>Airline</th>
-            <th>Source Airport</th>
-            <th>Destination Airport</th>      
+            {this.props.columns.map(function(col, i) {
+              return (
+                <th key={i}>
+                  {col.name}
+                </th>
+              );
+            })}   
           </tr>
         </thead>
         <tbody>
-        {data.map(function(route, i) {
+        {this.props.routes.map(function(route, i) {
           return (
             <tr key={i}>
               <td>{route.airline}</td>
