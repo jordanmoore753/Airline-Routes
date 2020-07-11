@@ -32,6 +32,7 @@ class Select extends Component {
               <option
                 key={i}
                 value={option.name}
+                disabled={option.disabled}
               >
                 {option.name}
               </option>

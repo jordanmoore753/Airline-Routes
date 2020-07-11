@@ -47,7 +47,7 @@ class App extends Component {
 
     this.state = {
       currentPage: 1,
-      maxPage: Math.ceil(routes.length / 25),
+      perPage: 25,
       selectedRoutes: humanizedRoutes,
       filteredAirlines: filteredAirlines,
       filteredAirports: filteredAirports,
@@ -57,7 +57,7 @@ class App extends Component {
   }
 
   nextPage = () => {
-    if (this.state.currentPage === this.state.maxPage) {
+    if (this.state.currentPage === Math.ceil(this.state.selectedRoutes.length / this.state.perPage)) {
       return;
     }
 
@@ -116,7 +116,8 @@ class App extends Component {
 
         availableAirlines.push({
           name: nameOfAL,
-          value: route.airline
+          value: route.airline,
+          disabled: false
         });
       }
 
@@ -127,7 +128,8 @@ class App extends Component {
 
         availableAirports.push({
           name: nameofAPDest,
-          value: route.dest
+          value: route.dest,
+          disabled: false
         });
       }
 
@@ -138,7 +140,8 @@ class App extends Component {
 
         availableAirports.push({
           name: nameofAPSrc,
-          value: route.src
+          value: route.src,
+          disabled: false
         });
       }
 
@@ -149,22 +152,38 @@ class App extends Component {
       };
     });
 
+    airlines.forEach(function(airline) {
+      if (!airlineHash[airline.id]) {
+        availableAirlines.push({
+          name: airline.name,
+          value: airline.id,
+          disabled: true
+        });
+      }
+    });
+
+    airports.forEach(function(airport) {
+      if (!airportHash[airport.code]) {
+        availableAirports.push({
+          name: airport.name,
+          value: airport.code,
+          disabled: true
+        });
+      }      
+    });
+
+    availableAirports.sort((a, b) => a > b );
+    
     this.setState({
       selectedRoutes: filteredRoutes,
       filteredAirlines: availableAirlines,
-      filteredAirports: availableAirports
+      filteredAirports: availableAirports,
+      currentPage: 1
     });
   };
 
   numberOfPages = (totalRoutes) => {
     return Math.ceil(totalRoutes / 25);
-  };
-
-  paginate = () => {
-    const lowRouteIndex = this.state.currentPage * 25 - 25;
-    const highRouteIndex = lowRouteIndex + 25;
-
-    return this.state.selectedRoutes.slice(lowRouteIndex, highRouteIndex);
   };
 
   render() {
@@ -196,13 +215,11 @@ class App extends Component {
           />
           <Table 
             columns={columns}
-            routes={this.paginate()}
-          />
-          <Nav
+            routes={this.state.selectedRoutes}
+            perPage={this.state.perPage}
+            currentPage={this.state.currentPage}
             prevPage={this.prevPage}
             nextPage={this.nextPage}
-            currentPage={this.state.currentPage}
-            maxPage={this.state.maxPage}
           />
         </section>
       </div>
