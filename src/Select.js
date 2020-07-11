@@ -3,17 +3,26 @@ import React, { Component } from 'react';
 class Select extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      value: this.props.value
+    };
   }
 
   optionChange = (e) => {
-    this.props.onSelect(e.target.value);
+    const context = this;
+    const value = e.target.value;
+
+    this.setState({ value: e.target.value }, function () {
+      context.props.onSelect(value);
+    });
   };
 
   render() {
     return (
       <div>
         <select
-          value={this.props.value}
+          value={this.state.value}
           name={this.props.titleKey}
           onChange={this.optionChange}
         >
@@ -22,7 +31,7 @@ class Select extends Component {
             return (
               <option
                 key={i}
-                value={option.id}
+                value={option.name}
               >
                 {option.name}
               </option>

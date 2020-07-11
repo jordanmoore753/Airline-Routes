@@ -11,6 +11,9 @@ const routes = data.routes;
 const airlines = data.airlines;
 const airports = data.airports;
 
+const airlinesByName = {};
+const airportsByName = {};
+
 const humanizedRoutes = routes.map(function(route) {
   return {
     airline: helpers.getAirlineById(route.airline).name,
@@ -20,6 +23,8 @@ const humanizedRoutes = routes.map(function(route) {
 });
 
 const filteredAirlines = airlines.map(function(airline) {
+  airlinesByName[airline.name] = airline.id;
+
   return {
     name: airline.name,
     value: airline.id
@@ -27,11 +32,14 @@ const filteredAirlines = airlines.map(function(airline) {
 });
 
 const filteredAirports = airports.map(function(airport) {
+  airportsByName[airport.name] = airport.code;
+
   return {
     name: airport.name,
     value: airport.code
   };
 });
+
 
 class App extends Component {
   constructor(props) {
@@ -40,11 +48,11 @@ class App extends Component {
     this.state = {
       currentPage: 1,
       maxPage: Math.ceil(routes.length / 25),
-      selectedAirline: '',
-      selectedAirport: '',
       selectedRoutes: humanizedRoutes,
       filteredAirlines: filteredAirlines,
-      filteredAirports: filteredAirports
+      filteredAirports: filteredAirports,
+      selectedAirline: '',
+      selectedAirport: ''
     };
   }
 
@@ -64,27 +72,32 @@ class App extends Component {
     this.setState({ currentPage: this.state.currentPage - 1 });
   };
 
-  updateSelectedAirline = (id) => {
-    this.setState({ selectedAirline: id });
-    this.updateRoutes(); // change filtered routes
+  updateSelectedAirline = (name) => {
+    this.setState({ selectedAirline: airlinesByName[name] || '' }, function () {
+      this.updateRoutes();
+    });
+    
   };
 
-  updateSelectedAirport = (code) => {
-    this.setState({ selectedAirport: code });
-    this.updateRoutes(); // change filtered routes
+  updateSelectedAirport = (name) => {
+    this.setState({ selectedAirport: airportsByName[name] || '' }, function () {
+      this.updateRoutes();
+    });
   };
 
   updateRoutes = () => {
-    const airlineId = helpers.getAirlineById(this.state.selectedAirline);
-    const airportCode = helpers.getAirportByCode(this.state.selectedAirport);
+    const airlineId = this.state.selectedAirline;
+    const airportCode = this.state.selectedAirport;
 
     let filteredRoutes = routes;
 
-    if (airlineId !== null) {
+    if (airlineId !== '') {
       filteredRoutes = filteredRoutes.filter((route) => route.airline === airlineId);
+    } else {
+      filteredRoutes = routes;
     }
 
-    if (airportCode !== null) {
+    if (airportCode !== '') {
       filteredRoutes = filteredRoutes.filter((route) => route.dest === airportCode || route.src === airportCode);
     }
 
@@ -95,8 +108,8 @@ class App extends Component {
     let nameOfAL;
     let nameofAP;
 
-    filteredRoutes.forEach(function(route) {
-      nameOfAL = helpers.getAirlineById(route.airline).name;
+    filteredRoutes = filteredRoutes.map(function(route) {
+      let nameOfAL = helpers.getAirlineById(route.airline).name;
 
       if (airlineHash[route.airline] === undefined) {
         airlineHash[route.airline] = true;
@@ -107,27 +120,33 @@ class App extends Component {
         });
       }
 
-      nameofAP = helpers.getAirportByCode(route.dest).name;
+      let nameofAPDest = helpers.getAirportByCode(route.dest).name;
 
       if (airportHash[route.dest] === undefined) {
         airportHash[route.dest] = true;
 
         availableAirports.push({
-          name: nameofAP,
+          name: nameofAPDest,
           value: route.dest
         });
       }
 
-      nameofAP = helpers.getAirportByCode(route.src).name;
+      let nameofAPSrc = helpers.getAirportByCode(route.src).name;
 
       if (airportHash[route.src] === undefined) {
         airportHash[route.src] = true;
 
         availableAirports.push({
-          name: nameofAP,
+          name: nameofAPSrc,
           value: route.src
         });
       }
+
+      return {
+        airline: nameOfAL,
+        dest: nameofAPDest,
+        src: nameofAPSrc
+      };
     });
 
     this.setState({
@@ -161,6 +180,20 @@ class App extends Component {
           <h1 className="title">Airline Routes</h1>
         </header>
         <section>
+          <Select 
+            options={this.state.filteredAirlines}
+            value={this.state.selectedAirline}
+            titleKey="name"
+            allTitle="All Airlines"
+            onSelect={this.updateSelectedAirline}
+          />
+          <Select 
+            options={this.state.filteredAirports}
+            value={this.state.selectedAirport}
+            titleKey="name"
+            allTitle="All Airports"
+            onSelect={this.updateSelectedAirport}
+          />
           <Table 
             columns={columns}
             routes={this.paginate()}
