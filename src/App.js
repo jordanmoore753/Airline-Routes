@@ -141,6 +141,13 @@ class App extends Component {
     return Math.ceil(totalRoutes / 25);
   };
 
+  paginate = () => {
+    const lowRouteIndex = this.state.currentPage * 25 - 25;
+    const highRouteIndex = lowRouteIndex + 25;
+
+    return this.state.selectedRoutes.slice(lowRouteIndex, highRouteIndex);
+  };
+
   render() {
     const columns = [
       {name: 'Airline', property: 'airline'},
@@ -156,11 +163,13 @@ class App extends Component {
         <section>
           <Table 
             columns={columns}
-            routes={this.state.selectedRoutes}
+            routes={this.paginate()}
           />
-          <Nav 
+          <Nav
             prevPage={this.prevPage}
             nextPage={this.nextPage}
+            currentPage={this.state.currentPage}
+            maxPage={this.state.maxPage}
           />
         </section>
       </div>
