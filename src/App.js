@@ -40,6 +40,8 @@ const filteredAirports = airports.map(function(airport) {
   };
 });
 
+airportsByName[''] = '';
+airlinesByName[''] = '';
 
 class App extends Component {
   constructor(props) {
@@ -55,6 +57,15 @@ class App extends Component {
       selectedAirport: ''
     };
   }
+
+  clearFilters = () => {
+    this.setState({
+      selectedAirline: '',
+      selectedAirport: ''
+    }, function () {
+      this.updateRoutes();
+    });
+  };
 
   nextPage = () => {
     if (this.state.currentPage === Math.ceil(this.state.selectedRoutes.length / this.state.perPage)) {
@@ -73,28 +84,33 @@ class App extends Component {
   };
 
   updateSelectedAirline = (name) => {
-    this.setState({ selectedAirline: airlinesByName[name] || '' }, function () {
+    if (name === 'All Airlines') {
+      name = '';
+    }
+    this.setState({ selectedAirline: name || '' }, function () {
       this.updateRoutes();
     });
     
   };
 
   updateSelectedAirport = (name) => {
-    this.setState({ selectedAirport: airportsByName[name] || '' }, function () {
+    if (name === 'All Airports') {
+      name = '';
+    }
+
+    this.setState({ selectedAirport: name || '' }, function () {
       this.updateRoutes();
     });
   };
 
   updateRoutes = () => {
-    const airlineId = this.state.selectedAirline;
-    const airportCode = this.state.selectedAirport;
+    const airlineId = airlinesByName[this.state.selectedAirline];
+    const airportCode = airportsByName[this.state.selectedAirport];
 
     let filteredRoutes = routes;
 
     if (airlineId !== '') {
       filteredRoutes = filteredRoutes.filter((route) => route.airline === airlineId);
-    } else {
-      filteredRoutes = routes;
     }
 
     if (airportCode !== '') {
@@ -199,20 +215,28 @@ class App extends Component {
           <h1 className="title">Airline Routes</h1>
         </header>
         <section>
-          <Select 
-            options={this.state.filteredAirlines}
-            value={this.state.selectedAirline}
-            titleKey="name"
-            allTitle="All Airlines"
-            onSelect={this.updateSelectedAirline}
-          />
-          <Select 
-            options={this.state.filteredAirports}
-            value={this.state.selectedAirport}
-            titleKey="name"
-            allTitle="All Airports"
-            onSelect={this.updateSelectedAirport}
-          />
+          <p>
+            <Select 
+              options={this.state.filteredAirlines}
+              value={this.state.selectedAirline}
+              titleKey="name"
+              allTitle="All Airlines"
+              onSelect={this.updateSelectedAirline}
+            />
+            <Select 
+              options={this.state.filteredAirports}
+              value={this.state.selectedAirport}
+              titleKey="name"
+              allTitle="All Airports"
+              onSelect={this.updateSelectedAirport}
+            />
+            <button
+              onClick={this.clearFilters}
+              disabled={this.state.selectedAirline === '' && this.state.selectedAirport === ''}
+            >
+              Clear Filters
+            </button>
+          </p>
           <Table 
             columns={columns}
             routes={this.state.selectedRoutes}

@@ -1,5 +1,11 @@
 const helpers = {
   getAirlineById: function(id) {
+    if (id === '') {
+      return {
+        id: ''
+      };
+    }
+
     let selected;
 
     airlines.forEach(function(airline) {
@@ -12,6 +18,12 @@ const helpers = {
   },
 
   getAirportByCode: function(code) {
+    if (code === '') {
+      return {
+        code: ''
+      };
+    }
+
     for (let i = 0; i < airports.length; i += 1) {
       if (airports[i].code === code) {
         return airports[i];

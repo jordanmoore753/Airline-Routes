@@ -3,26 +3,17 @@ import React, { Component } from 'react';
 class Select extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      value: this.props.value
-    };
   }
 
   optionChange = (e) => {
-    const context = this;
-    const value = e.target.value;
-
-    this.setState({ value: e.target.value }, function () {
-      context.props.onSelect(value);
-    });
+    this.props.onSelect(e.target.value);
   };
 
   render() {
     return (
-      <div>
+      <div className="select-filter">
         <select
-          value={this.state.value}
+          value={this.props.value}
           name={this.props.titleKey}
           onChange={this.optionChange}
         >
@@ -45,3 +36,17 @@ class Select extends Component {
 }
 
 export default Select;
+
+/*
+
+change Select to state
+need to change how the state is stored on App
+Right now it stores the id
+The id needs to become the name so that the name can be transmitted
+to the Select
+same with the code, needs to be the name of the airport instead
+
+in the updateRoutes method, get the id of the airline/airport 
+by accessing the relevant hash O(1)
+
+*/

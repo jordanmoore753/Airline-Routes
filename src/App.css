@@ -42,6 +42,10 @@ select {
   margin: 0 .5em;
 }
 
+.select-filter {
+  display: inline;
+}
+
 .map {
   width: 90%;
 }
