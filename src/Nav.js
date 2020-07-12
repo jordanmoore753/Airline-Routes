@@ -20,17 +20,19 @@ function Nav(props) {
   const indices = generateLowAndHighPages(props.maxPage, props.currentPage);
 
   return (
-    <div>
+    <div className="pagination">
       <p>
-        You are on page {indices} out of {props.maxPage}.
+        You are viewing routes {indices} out of {props.maxPage}.
       </p>
       <button 
         onClick={props.prevPage}
+        disabled={props.currentPage === 1}
       >
         Previous
       </button>
       <button 
         onClick={props.nextPage}
+        disabled={props.currentPage === Math.ceil(props.maxPage / props.perPage)}
       >
         Next
       </button>

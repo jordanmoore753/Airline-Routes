@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Table from './Table';
 import Nav from './Nav';
 import Select from './Select';
+import Map from './Map';
 
 import './App.css';
 import data from './data';
@@ -11,8 +12,8 @@ const routes = data.routes;
 const airlines = data.airlines;
 const airports = data.airports;
 
-const airlinesByName = {};
-const airportsByName = {};
+const airlinesByName = data.airlinesByName;
+const airportsByName = data.airportsByName;
 
 const humanizedRoutes = routes.map(function(route) {
   return {
@@ -23,8 +24,6 @@ const humanizedRoutes = routes.map(function(route) {
 });
 
 const filteredAirlines = airlines.map(function(airline) {
-  airlinesByName[airline.name] = airline.id;
-
   return {
     name: airline.name,
     value: airline.id
@@ -32,16 +31,11 @@ const filteredAirlines = airlines.map(function(airline) {
 });
 
 const filteredAirports = airports.map(function(airport) {
-  airportsByName[airport.name] = airport.code;
-
   return {
     name: airport.name,
     value: airport.code
   };
 });
-
-airportsByName[''] = '';
-airlinesByName[''] = '';
 
 class App extends Component {
   constructor(props) {
@@ -215,28 +209,29 @@ class App extends Component {
           <h1 className="title">Airline Routes</h1>
         </header>
         <section>
-          <p>
-            <Select 
-              options={this.state.filteredAirlines}
-              value={this.state.selectedAirline}
-              titleKey="name"
-              allTitle="All Airlines"
-              onSelect={this.updateSelectedAirline}
-            />
-            <Select 
-              options={this.state.filteredAirports}
-              value={this.state.selectedAirport}
-              titleKey="name"
-              allTitle="All Airports"
-              onSelect={this.updateSelectedAirport}
-            />
-            <button
-              onClick={this.clearFilters}
-              disabled={this.state.selectedAirline === '' && this.state.selectedAirport === ''}
-            >
-              Clear Filters
-            </button>
-          </p>
+          <Map 
+            routes={this.state.selectedRoutes}
+          />
+          <Select 
+            options={this.state.filteredAirlines}
+            value={this.state.selectedAirline}
+            titleKey="name"
+            allTitle="All Airlines"
+            onSelect={this.updateSelectedAirline}
+          />
+          <Select 
+            options={this.state.filteredAirports}
+            value={this.state.selectedAirport}
+            titleKey="name"
+            allTitle="All Airports"
+            onSelect={this.updateSelectedAirport}
+          />
+          <button
+            onClick={this.clearFilters}
+            disabled={this.state.selectedAirline === '' && this.state.selectedAirport === ''}
+          >
+            Clear Filters
+          </button>
           <Table 
             columns={columns}
             routes={this.state.selectedRoutes}

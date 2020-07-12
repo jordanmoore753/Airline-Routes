@@ -1431,4 +1431,18 @@ const airports = [
 
 ];
 
-export default {routes, airlines, airports, helpers};
+const airlinesByName = {};
+const airportsByName = {};
+
+airlines.forEach(function(airline) {
+  airlinesByName[airline.name] = airline.id;
+});
+
+airports.forEach(function(airport) {
+  airportsByName[airport.name] = airport.code;
+});
+
+airlinesByName[''] = '';
+airportsByName[''] = '';
+
+export default {routes, airlines, airports, helpers, airlinesByName, airportsByName};
